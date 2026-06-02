@@ -1,10 +1,8 @@
-
 {
   "name": "skin-journey-backend",
   "version": "1.0.0",
   "description": "Skin Journey AI Skincare App Backend",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
@@ -32,4 +30,3 @@
     "node": "20.x"
   }
 }
-
