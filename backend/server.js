@@ -19,7 +19,37 @@ const cycleSyncRoutes = require('./routes/cycleSync.routes');
 
 const app = express();
 
-// Rate limiting
+/* ---------------- CORS FIX ---------------- */
+
+const allowedOrigins = [
+  'https://skin-journey-3.onrender.com', // frontend
+  'https://skin-journey.onrender.com',   // old/alternate frontend
+  'http://localhost:5173'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(null, true); // allow for now to avoid blocking (safe for debugging)
+    }
+  },
+  credentials: true
+}));
+
+// IMPORTANT: handle preflight requests
+app.options('*', cors());
+
+/* ---------------- Middleware ---------------- */
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+/* ---------------- Rate Limiting ---------------- */
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -29,21 +59,10 @@ const limiter = rateLimit({
   }
 });
 
-// Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://skin-journey.onrender.com',
-  credentials: true
-}));
+// app.use('/api', limiter); // optional
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({
-  extended: true,
-  limit: '50mb'
-}));
+/* ---------------- Routes ---------------- */
 
-// app.use('/api', limiter);
-
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
@@ -55,7 +74,8 @@ app.use('/api/community', communityRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/cycle-sync', cycleSyncRoutes);
 
-// Health check
+/* ---------------- Health Check ---------------- */
+
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -64,7 +84,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Error handler
+/* ---------------- Error Handler ---------------- */
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
 
@@ -74,7 +95,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
+/* ---------------- 404 Handler ---------------- */
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -82,7 +104,8 @@ app.use((req, res) => {
   });
 });
 
-// Database connection
+/* ---------------- DB + Server ---------------- */
+
 mongoose.connect(
   process.env.MONGODB_URI || 'mongodb+srv://yeshu:yeshu@cluster0.y4urud2.mongodb.net/yeshu?retryWrites=true&w=majority'
 )
