@@ -31,7 +31,7 @@ const limiter = rateLimit({
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://skin-journey-1.onrender.com',
+  origin: process.env.CLIENT_URL || 'https://skin-journey.onrender.com',
   credentials: true
 }));
 
