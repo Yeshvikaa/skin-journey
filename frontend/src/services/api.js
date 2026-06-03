@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://skin-journey.onrender.com',
+  baseURL: import.meta.env.VITE_API_URL || 'https://skin-journey-1.onrender.com',
   timeout: 30000,
 });
 
